@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — GSU Campus Food</title>
+  <link href="/shared/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link href="/shared/css/base.css" rel="stylesheet">
+</head>
+<body class="d-flex align-items-center justify-content-center py-5 position-relative" style="min-height: 100vh;">
+  
+  <!-- Theme Toggle Button (Floating Top Right) -->
+  <div class="position-absolute top-0 end-0 p-4">
+    <button id="themeToggleBtn" class="btn btn-outline-light border-0" title="Toggle Theme">
+      <i id="themeIcon" class="bi bi-moon-stars-fill text-warning fs-5"></i>
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        
+        <!-- Elevated Minimalist Card -->
+        <div class="card border-0 shadow-lg" style="background-color: var(--gsu-surface); border-radius: 16px;">
+          <div class="card-body p-5">
+            
+            <div class="text-center mb-4">
+              <h1 class="h3 fw-bold text-white mb-2">Create an Account</h1>
+              <p class="text-secondary small">Student, staff, or delivery rider</p>
+            </div>
+
+            <!-- Error Alert -->
+            <div id="registerAlert" class="alert alert-danger d-none shadow-sm" role="alert" style="border-radius: 8px; font-size: 0.9rem;"></div>
+
+            <!-- Registration Form -->
+            <form id="registerForm" novalidate>
+              <div class="mb-4">
+                <label for="fullName" class="form-label text-secondary small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Full Name</label>
+                <input type="text" class="form-control form-control-lg bg-dark border-secondary text-white shadow-none" id="fullName" required autocomplete="name" style="border-radius: 8px;">
+              </div>
+              
+              <div class="mb-4">
+                <label for="email" class="form-label text-secondary small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Email Address</label>
+                <input type="email" class="form-control form-control-lg bg-dark border-secondary text-white shadow-none" id="email" required autocomplete="email" style="border-radius: 8px;">
+              </div>
+              
+              <div class="mb-4">
+                <label for="phone" class="form-label text-secondary small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Phone Number</label>
+                <input type="text" class="form-control form-control-lg bg-dark border-secondary text-white shadow-none" id="phone" required autocomplete="tel" style="border-radius: 8px;">
+              </div>
+              
+              <div class="mb-4">
+                <label for="role" class="form-label text-secondary small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">I am a</label>
+                <select class="form-select form-select-lg bg-dark border-secondary text-white shadow-none" id="role" required style="border-radius: 8px;">
+                  <option value="student">Student</option>
+                  <option value="staff">Staff</option>
+                  <option value="rider">Delivery Rider</option>
+                </select>
+                <div class="form-text text-muted mt-2" style="font-size: 0.8rem;">
+                  Vendor accounts are created by an administrator — contact one if you're registering a food stall.
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <label for="password" class="form-label text-secondary small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Password</label>
+                <input type="password" class="form-control form-control-lg bg-dark border-secondary text-white shadow-none" id="password" minlength="8" required autocomplete="new-password" style="border-radius: 8px;">
+                <div class="form-text text-muted mt-2" style="font-size: 0.8rem;">At least 8 characters.</div>
+              </div>
+              
+              <button type="submit" class="btn btn-gsu-primary btn-lg w-100 fw-medium mt-2" id="registerBtn" style="border-radius: 8px; transition: all 0.2s ease;">
+                Create Account
+              </button>
+            </form>
+
+            <div class="text-center mt-4 pt-2">
+              <p class="text-secondary small mb-0">
+                Already have an account? <a href="/shared/login.html" class="text-decoration-none fw-medium" style="color: #10B981;">Sign In</a>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (Allowed by the CSP fix in Phase 1) -->
+  <script src="/shared/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Added Theme Script -->
+  <script src="/shared/js/theme.js"></script>
+  <script src="/shared/js/apiClient.js"></script>
+  <script>
+    (function () {
+      const form = document.getElementById('registerForm');
+      const alertBox = document.getElementById('registerAlert');
+      const registerBtn = document.getElementById('registerBtn');
+
+      function showError(message) {
+        alertBox.textContent = message;
+        alertBox.classList.remove('d-none');
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.classList.add('d-none');
+        registerBtn.disabled = true;
+        registerBtn.textContent = 'Creating account…';
+
+        const payload = {
+          fullName: document.getElementById('fullName').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          role: document.getElementById('role').value,
+          password: document.getElementById('password').value,
+        };
+
+        try {
+          await window.GSUApi.apiRequest('/auth/register', {
+            method: 'POST',
+            auth: false,
+            body: payload,
+          });
+          window.location.href = '/shared/login.html?registered=1';
+        } catch (err) {
+          showError(err.message || 'Registration failed. Please try again.');
+        } finally {
+          registerBtn.disabled = false;
+          registerBtn.textContent = 'Create Account';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

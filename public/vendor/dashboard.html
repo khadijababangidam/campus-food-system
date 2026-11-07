@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vendor Dashboard — GSU Campus Food</title>
+  <link href="/shared/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link href="/shared/css/base.css" rel="stylesheet">
+  <style>
+    /* Vendor specific tab styling */
+    .nav-tabs .nav-link { color: var(--gsu-text-muted); border: none; padding: 1rem 1.5rem; font-weight: 500; }
+    .nav-tabs .nav-link:hover { color: var(--gsu-text); border-bottom: 2px solid var(--gsu-border); }
+    .nav-tabs .nav-link.active { color: var(--gsu-primary); background: transparent; border-bottom: 2px solid var(--gsu-primary); }
+  </style>
+</head>
+<body class="pb-5">
+  <!-- Glass Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top navbar-gsu py-3 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="navbar-brand mb-0 h1 fw-bold text-white tracking-wide d-flex align-items-center gap-2">
+        <i class="bi bi-shop text-success"></i> GSU Campus Food <span class="text-muted fw-normal fs-6 ms-2 d-none d-sm-inline">| Vendor Portal</span>
+      </span>
+      
+      <!-- Added Flex Container for Navbar Buttons -->
+      <div class="d-flex align-items-center">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="btn btn-sm btn-outline-light border-0 me-2 me-md-3" title="Toggle Theme">
+          <i id="themeIcon" class="bi bi-moon-stars-fill text-warning fs-5"></i>
+        </button>
+        <button id="logoutBtn" class="btn btn-sm btn-outline-danger fw-medium px-3 px-md-4" style="border-radius: 8px;">Log out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-4 border-bottom border-secondary">
+      <li class="nav-item">
+        <button class="nav-link active" id="menuTabBtn" data-bs-toggle="tab" data-bs-target="#menuTab" type="button">My Menu</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="ordersTabBtn" data-bs-toggle="tab" data-bs-target="#ordersTab" type="button">Incoming Orders</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="walletTabBtn" data-bs-toggle="tab" data-bs-target="#walletTab" type="button">Wallet</button>
+      </li>
+    </ul>
+
+    <!-- Global Alert Box -->
+    <div id="alertBox" class="alert d-none shadow-sm mb-4 border-0" role="alert" style="border-radius: 8px;"></div>
+
+    <div class="tab-content">
+      <!-- Menu Tab -->
+      <div class="tab-pane fade show active" id="menuTab">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h1 class="h4 mb-0 fw-bold text-white">My Menu Items</h1>
+          <button class="btn btn-gsu-primary fw-medium px-4 py-2 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#itemModal" id="addItemBtn" style="border-radius: 8px;">
+            <i class="bi bi-plus-lg"></i> Add Item
+          </button>
+        </div>
+        <div id="menuList" class="row g-4"></div>
+        <div id="emptyState" class="text-center py-5 d-none">
+          <i class="bi bi-journal-x display-1 text-muted opacity-25 mb-3 d-block"></i>
+          <p class="text-muted fs-5 mb-0">You haven't added any menu items yet.</p>
+        </div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div class="tab-pane fade" id="ordersTab">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h1 class="h4 mb-0 fw-bold text-white">Incoming Orders</h1>
+          <select id="orderStatusFilter" class="form-select form-select-sm bg-dark border-secondary text-white shadow-none w-auto" style="border-radius: 8px;">
+            <option value="">All statuses</option>
+            <option value="pending">Pending Payment</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="preparing">Preparing</option>
+            <option value="ready">Ready</option>
+            <option value="out_for_delivery">Out for Delivery</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div id="ordersList" class="d-flex flex-column gap-3"></div>
+        <div id="ordersEmpty" class="text-center py-5 d-none">
+          <i class="bi bi-inbox display-1 text-muted opacity-25 mb-3 d-block"></i>
+          <p class="text-muted fs-5 mb-0">No orders yet.</p>
+        </div>
+      </div>
+
+      <!-- Wallet Tab -->
+      <div class="tab-pane fade" id="walletTab">
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-md-6">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px;">
+              <div class="card-body p-4 text-center">
+                <div class="text-uppercase fw-semibold mb-2" style="color: var(--gsu-primary); font-size: 0.85rem; letter-spacing: 0.5px;">Available Balance</div>
+                <div class="display-6 fw-bold text-white" id="walletAvailableBalance">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px;">
+              <div class="card-body p-4 text-center">
+                <div class="text-uppercase fw-semibold mb-2" style="color: var(--gsu-accent); font-size: 0.85rem; letter-spacing: 0.5px;">Total Earned</div>
+                <div class="display-6 fw-bold text-white" id="walletTotalEarned">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-3">
+          <h2 class="h5 mb-0 fw-bold text-white">Withdrawal Requests</h2>
+          <button class="btn btn-gsu-primary btn-sm px-3 fw-medium d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#withdrawalModal" style="border-radius: 8px;">
+            <i class="bi bi-cash-coin"></i> Request Withdrawal
+          </button>
+        </div>
+        <div id="withdrawalsList" class="d-flex flex-column gap-3 mb-5"></div>
+        <div id="withdrawalsEmpty" class="text-center py-4 d-none">
+          <p class="text-muted mb-0">No withdrawal requests yet.</p>
+        </div>
+
+        <h2 class="h5 mb-3 fw-bold text-white">Recent Wallet Activity</h2>
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+          <table class="table table-dark table-hover mb-0">
+            <thead class="table-active"><tr><th class="py-3 px-4">Date</th><th class="py-3">Type</th><th class="py-3">Amount</th><th class="py-3">Reference</th></tr></thead>
+            <tbody id="walletTxTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Item Modal -->
+  <div class="modal fade" id="itemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="background-color: var(--gsu-surface); border-radius: 16px;">
+        <div class="modal-header border-bottom border-secondary px-4 py-3">
+          <h5 class="modal-title fw-bold text-white" id="itemModalTitle">Add Menu Item</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="itemForm" novalidate>
+            <input type="hidden" id="itemId" value="">
+            <div class="mb-3">
+              <label for="itemName" class="form-label text-secondary small fw-semibold text-uppercase">Item Name</label>
+              <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="itemName" maxlength="120" required style="border-radius: 8px;">
+            </div>
+            <div class="mb-3">
+              <label for="itemCategory" class="form-label text-secondary small fw-semibold text-uppercase">Category</label>
+              <select class="form-select bg-dark border-secondary text-white shadow-none" id="itemCategory" style="border-radius: 8px;">
+                <option value="">— No category —</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="itemPrice" class="form-label text-secondary small fw-semibold text-uppercase">Price (₦)</label>
+              <input type="number" class="form-control bg-dark border-secondary text-white shadow-none" id="itemPrice" min="0" step="0.01" required style="border-radius: 8px;">
+            </div>
+            <div class="mb-4">
+              <label for="itemDescription" class="form-label text-secondary small fw-semibold text-uppercase">Description (Optional)</label>
+              <textarea class="form-control bg-dark border-secondary text-white shadow-none" id="itemDescription" rows="3" maxlength="2000" style="border-radius: 8px;"></textarea>
+            </div>
+            <div id="formError" class="alert alert-danger d-none small shadow-sm" style="border-radius: 8px;"></div>
+          </form>
+        </div>
+        <div class="modal-footer border-top border-secondary px-4 py-3">
+          <button type="button" class="btn btn-outline-secondary fw-medium" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+          <button type="button" class="btn btn-gsu-primary fw-medium px-4" id="saveItemBtn" style="border-radius: 8px;">Save Item</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Request Withdrawal Modal -->
+  <div class="modal fade" id="withdrawalModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="background-color: var(--gsu-surface); border-radius: 16px;">
+        <div class="modal-header border-bottom border-secondary px-4 py-3">
+          <h5 class="modal-title fw-bold text-white">Request Withdrawal</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="withdrawalForm" novalidate>
+            <p class="small text-muted mb-3">Available balance: <span id="withdrawalAvailableBalance" class="text-white fw-semibold">—</span></p>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-semibold text-uppercase">Amount (₦)</label>
+              <input type="number" class="form-control bg-dark border-secondary text-white shadow-none" id="wAmount" min="0.01" step="0.01" required style="border-radius: 8px;">
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-semibold text-uppercase">Bank Name</label>
+              <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="wBankName" required style="border-radius: 8px;">
+            </div>
+            <div class="row g-3 mb-4">
+              <div class="col-sm-6">
+                <label class="form-label text-secondary small fw-semibold text-uppercase">Account Number</label>
+                <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="wAccountNumber" required style="border-radius: 8px;">
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label text-secondary small fw-semibold text-uppercase">Account Name</label>
+                <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="wAccountName" required style="border-radius: 8px;">
+              </div>
+            </div>
+            <div id="withdrawalFormError" class="alert alert-danger d-none small shadow-sm" style="border-radius: 8px;"></div>
+          </form>
+        </div>
+        <div class="modal-footer border-top border-secondary px-4 py-3">
+          <button type="button" class="btn btn-outline-secondary fw-medium" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+          <button type="button" class="btn btn-gsu-primary fw-medium px-4" id="submitWithdrawalBtn" style="border-radius: 8px;">Submit Request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container (FR5) -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+    <div id="orderToast" class="toast border-0 shadow-lg" style="background-color: var(--gsu-surface); border-radius: 12px;" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header border-bottom border-secondary border-opacity-25" style="background-color: transparent; color: white;">
+        <i class="bi bi-bell-fill text-success me-2"></i>
+        <strong class="me-auto fw-bold">New Order Received!</strong>
+        <small class="text-muted">Just now</small>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body text-white">
+        A new confirmed order is ready for preparation. Check your incoming orders tab.
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Added Theme Script -->
+  <script src="/shared/js/theme.js"></script>
+  <script src="/shared/js/apiClient.js"></script>
+  <script src="/shared/js/authGuard.js"></script>
+  <script src="/vendor/vendor.js"></script>
+</body>
+</html>

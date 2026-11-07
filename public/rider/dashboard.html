@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Rider Dashboard — GSU Campus Food</title>
+  <link href="/shared/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link href="/shared/css/base.css" rel="stylesheet">
+  <style>
+    /* Mobile-first premium app styling */
+    body { background-color: var(--gsu-bg); }
+    
+    /* Use dynamic variables instead of hardcoded RGBA */
+    .glass-header { background: var(--gsu-nav-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--gsu-border); }
+    
+    /* App-like Segmented Control for Tabs */
+    .segmented-control { background-color: var(--gsu-border); border-radius: 12px; padding: 4px; display: flex; }
+    .segmented-control .nav-item { flex: 1; }
+    .segmented-control .nav-link { 
+      color: var(--gsu-text-muted); border-radius: 10px; border: none; padding: 10px 0; 
+      font-weight: 600; text-align: center; transition: all 0.2s ease; font-size: 0.9rem;
+    }
+    .segmented-control .nav-link.active { background-color: var(--gsu-surface); color: var(--gsu-text); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    
+    /* Large thumb-friendly buttons */
+    .thumb-btn { height: 54px; border-radius: 12px; font-weight: 600; font-size: 1rem; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body class="pb-5">
+  <!-- Sticky Glass Navbar -->
+  <nav class="navbar sticky-top glass-header py-3 shadow-sm mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="navbar-brand mb-0 h4 fw-bold text-white tracking-wide d-flex align-items-center gap-2">
+        <i class="bi bi-bicycle text-success"></i> GSU Rider
+      </span>
+      
+      <!-- Added Flex Container for Navbar Buttons -->
+      <div class="d-flex align-items-center">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="btn btn-sm btn-outline-light border-0 me-2" title="Toggle Theme">
+          <i id="themeIcon" class="bi bi-moon-stars-fill text-warning fs-5"></i>
+        </button>
+        <button id="logoutBtn" class="btn btn-sm btn-outline-danger fw-medium px-3" style="border-radius: 8px;">
+          <i class="bi bi-box-arrow-right d-sm-none"></i><span class="d-none d-sm-inline">Log out</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div id="alertBox" class="alert d-none shadow-sm mb-4 border-0" role="alert" style="border-radius: 12px;"></div>
+
+    <!-- Segmented Control (Replaces standard tabs) -->
+    <ul class="nav segmented-control mb-4 shadow-sm" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active w-100" id="availableTabBtn" data-bs-toggle="tab" data-bs-target="#availableTab" type="button" role="tab">
+          <i class="bi bi-list-ul me-1"></i> Available Pool
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link w-100" id="mineTabBtn" data-bs-toggle="tab" data-bs-target="#mineTab" type="button" role="tab">
+          <i class="bi bi-person-lines-fill me-1"></i> My Deliveries
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- Available Pool Tab -->
+      <div class="tab-pane fade show active" id="availableTab" role="tabpanel">
+        <div class="d-flex align-items-center gap-2 mb-3 px-1">
+          <i class="bi bi-info-circle text-muted"></i>
+          <p class="text-muted small mb-0">Orders ready at the vendor. Be the first to accept.</p>
+        </div>
+        <div id="availableList" class="d-flex flex-column gap-3"></div>
+        <div id="availableEmpty" class="text-center py-5 d-none mt-4">
+          <i class="bi bi-cup-hot display-1 text-muted opacity-25 mb-3 d-block"></i>
+          <p class="text-muted fs-5 mb-0">No deliveries waiting right now.</p>
+        </div>
+      </div>
+
+      <!-- My Deliveries Tab -->
+      <div class="tab-pane fade" id="mineTab" role="tabpanel">
+        <div id="mineList" class="d-flex flex-column gap-3"></div>
+        <div id="mineEmpty" class="text-center py-5 d-none mt-4">
+          <i class="bi bi-inbox display-1 text-muted opacity-25 mb-3 d-block"></i>
+          <p class="text-muted fs-5 mb-0">You haven't accepted any deliveries yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Added Theme Script -->
+  <script src="/shared/js/theme.js"></script>
+  <script src="/shared/js/apiClient.js"></script>
+  <script src="/shared/js/authGuard.js"></script>
+  <script src="/rider/rider.js"></script>
+</body>
+</html>

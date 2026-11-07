@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — GSU Campus Food</title>
+  <link href="/shared/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link href="/shared/css/base.css" rel="stylesheet">
+  <style>
+    /* Admin specific tweaks */
+    .nav-tabs .nav-link { color: var(--gsu-text-muted); border: none; padding: 1rem 1.5rem; font-weight: 500; }
+    .nav-tabs .nav-link:hover { color: var(--gsu-text); border-bottom: 2px solid var(--gsu-border); }
+    .nav-tabs .nav-link.active { color: var(--gsu-primary); background: transparent; border-bottom: 2px solid var(--gsu-primary); }
+    .table-dark { --bs-table-bg: transparent; --bs-table-color: var(--gsu-text); --bs-table-border-color: var(--gsu-border); }
+  </style>
+</head>
+<body class="pb-5">
+  <!-- Glass Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top navbar-gsu py-3 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="navbar-brand mb-0 h1 fw-bold text-white tracking-wide">GSU Campus Food <span class="text-muted fw-normal fs-6 ms-2">| Admin Workspace</span></span>
+      
+      <!-- Added Flex Container for Navbar Buttons -->
+      <div class="d-flex align-items-center">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="btn btn-sm btn-outline-light border-0 me-3" title="Toggle Theme">
+          <i id="themeIcon" class="bi bi-moon-stars-fill text-warning fs-5"></i>
+        </button>
+        <button id="logoutBtn" class="btn btn-sm btn-outline-danger fw-medium px-4" style="border-radius: 8px;">Log out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-4 border-bottom border-secondary">
+      <li class="nav-item">
+        <button class="nav-link active" id="analyticsTabBtn" data-bs-toggle="tab" data-bs-target="#analyticsTab" type="button">Analytics</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="vendorsTabBtn" data-bs-toggle="tab" data-bs-target="#vendorsTab" type="button">Vendors</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="usersTabBtn" data-bs-toggle="tab" data-bs-target="#usersTab" type="button">Users</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="withdrawalsTabBtn" data-bs-toggle="tab" data-bs-target="#withdrawalsTab" type="button">Withdrawals</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="refundsTabBtn" data-bs-toggle="tab" data-bs-target="#refundsTab" type="button">Refunds</button>
+      </li>
+    </ul>
+
+    <!-- Global Alert Box -->
+    <div id="alertBox" class="alert d-none shadow-sm" role="alert" style="border-radius: 8px;"></div>
+
+    <div class="tab-content">
+      <!-- Analytics Tab -->
+      <div class="tab-pane fade show active" id="analyticsTab">
+        
+        <div class="row g-4 mb-5">
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px;">
+              <div class="card-body p-4 text-center">
+                <div class="text-uppercase fw-semibold mb-2" style="color: var(--gsu-primary); font-size: 0.85rem; letter-spacing: 0.5px;">Total Orders</div>
+                <div class="display-5 fw-bold text-white" id="statTotalOrders">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px;">
+              <div class="card-body p-4 text-center">
+                <div class="text-uppercase fw-semibold mb-2" style="color: var(--gsu-accent); font-size: 0.85rem; letter-spacing: 0.5px;">Total Revenue</div>
+                <div class="display-5 fw-bold text-white" id="statTotalRevenue">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-5">
+          <div class="col-12 col-lg-5">
+            <div class="d-flex align-items-center mb-3">
+              <h2 class="h5 mb-0 fw-bold text-white">Orders by Status</h2>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+              <table class="table table-dark table-hover mb-0">
+                <tbody id="statusTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-7">
+            <div class="d-flex align-items-center mb-3">
+              <h2 class="h5 mb-0 fw-bold text-white">Revenue by Vendor <span class="text-muted fw-normal fs-6">(Top 10)</span></h2>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+              <table class="table table-dark table-hover mb-0">
+                <thead class="table-active"><tr><th class="py-3 px-4">Vendor</th><th class="py-3">Orders</th><th class="py-3">Revenue</th></tr></thead>
+                <tbody id="vendorRevenueTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <h2 class="h5 mb-3 fw-bold text-white">Orders per Day <span class="text-muted fw-normal fs-6">(Last 14 Days)</span></h2>
+          <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+            <table class="table table-dark table-hover mb-0">
+              <thead class="table-active"><tr><th class="py-3 px-4">Date</th><th class="py-3">Orders</th></tr></thead>
+              <tbody id="dailyOrdersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vendors Tab -->
+      <div class="tab-pane fade" id="vendorsTab">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h1 class="h4 mb-0 fw-bold text-white">Vendor Management</h1>
+          <div class="d-flex gap-2">
+            <select id="vendorStatusFilter" class="form-select form-select-sm bg-dark border-secondary text-white shadow-none" style="border-radius: 8px;">
+              <option value="">All statuses</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="suspended">Suspended</option>
+            </select>
+            <button class="btn btn-gsu-primary btn-sm px-3 fw-medium text-nowrap" data-bs-toggle="modal" data-bs-target="#vendorModal" style="border-radius: 8px;">+ Add Vendor</button>
+          </div>
+        </div>
+        <div id="vendorsList" class="d-flex flex-column gap-3"></div>
+        <div id="vendorsEmpty" class="text-center py-5 d-none">
+          <p class="text-muted fs-5 mb-0">No vendors found.</p>
+        </div>
+      </div>
+
+      <!-- Users Tab -->
+      <div class="tab-pane fade" id="usersTab">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h1 class="h4 mb-0 fw-bold text-white">User Management</h1>
+          <select id="userRoleFilter" class="form-select form-select-sm bg-dark border-secondary text-white shadow-none w-auto" style="border-radius: 8px;">
+            <option value="">All roles</option>
+            <option value="student">Student</option>
+            <option value="staff">Staff</option>
+            <option value="vendor">Vendor</option>
+            <option value="rider">Rider</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div id="usersList" class="d-flex flex-column gap-3"></div>
+        <div id="usersEmpty" class="text-center py-5 d-none">
+          <p class="text-muted fs-5 mb-0">No users found.</p>
+        </div>
+      </div>
+
+      <!-- Withdrawals Tab -->
+      <div class="tab-pane fade" id="withdrawalsTab">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+          <h1 class="h4 mb-0 fw-bold text-white">Withdrawal Requests</h1>
+          <select id="withdrawalStatusFilter" class="form-select form-select-sm bg-dark border-secondary text-white shadow-none w-auto" style="border-radius: 8px;">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="paid">Paid</option>
+            <option value="rejected">Rejected</option>
+            <option value="">All statuses</option>
+          </select>
+        </div>
+        <div id="withdrawalsAdminList" class="d-flex flex-column gap-3"></div>
+        <div id="withdrawalsAdminEmpty" class="text-center py-5 d-none">
+          <p class="text-muted fs-5 mb-0">No withdrawal requests found.</p>
+        </div>
+      </div>
+
+      <!-- Refunds Tab -->
+      <div class="tab-pane fade" id="refundsTab">
+        <h1 class="h4 mb-4 fw-bold text-white">Pending Refunds</h1>
+        <div id="refundsList" class="d-flex flex-column gap-3"></div>
+        <div id="refundsEmpty" class="text-center py-5 d-none">
+          <p class="text-muted fs-5 mb-0">No pending refund requests.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Vendor Modal -->
+  <div class="modal fade" id="vendorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="background-color: var(--gsu-surface); border-radius: 16px;">
+        <div class="modal-header border-bottom border-secondary px-4 py-3">
+          <h5 class="modal-title fw-bold text-white">Add New Vendor</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="vendorForm" novalidate>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-semibold text-uppercase">Owner Full Name</label>
+              <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="vFullName" required style="border-radius: 8px;">
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6">
+                <label class="form-label text-secondary small fw-semibold text-uppercase">Email</label>
+                <input type="email" class="form-control bg-dark border-secondary text-white shadow-none" id="vEmail" required style="border-radius: 8px;">
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label text-secondary small fw-semibold text-uppercase">Phone</label>
+                <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="vPhone" required style="border-radius: 8px;">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-semibold text-uppercase">Business Name</label>
+              <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="vBusinessName" required style="border-radius: 8px;">
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-semibold text-uppercase">Temporary Password</label>
+              <input type="text" class="form-control bg-dark border-secondary text-white shadow-none" id="vPassword" minlength="8" required style="border-radius: 8px;">
+              <div class="form-text text-muted mt-1" style="font-size: 0.8rem;">Share this with the vendor securely.</div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label text-secondary small fw-semibold text-uppercase">Description (Optional)</label>
+              <textarea class="form-control bg-dark border-secondary text-white shadow-none" id="vDescription" rows="2" style="border-radius: 8px;"></textarea>
+            </div>
+            <div id="vendorFormError" class="alert alert-danger d-none small shadow-sm" style="border-radius: 8px;"></div>
+          </form>
+        </div>
+        <div class="modal-footer border-top border-secondary px-4 py-3">
+          <button type="button" class="btn btn-outline-secondary fw-medium" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+          <button type="button" class="btn btn-gsu-primary fw-medium px-4" id="saveVendorBtn" style="border-radius: 8px;">Create Vendor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Added Theme Script -->
+  <script src="/shared/js/theme.js"></script>
+  <script src="/shared/js/apiClient.js"></script>
+  <script src="/shared/js/authGuard.js"></script>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

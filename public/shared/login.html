@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — GSU Campus Food</title>
+  <link href="/shared/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link href="/shared/css/base.css" rel="stylesheet">
+</head>
+<body class="d-flex align-items-center justify-content-center position-relative" style="min-height: 100vh;">
+  
+  <!-- Theme Toggle Button (Floating Top Right) -->
+  <div class="position-absolute top-0 end-0 p-4">
+    <button id="themeToggleBtn" class="btn btn-outline-light border-0" title="Toggle Theme">
+      <i id="themeIcon" class="bi bi-moon-stars-fill text-warning fs-5"></i>
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+        
+        <!-- Elevated Minimalist Card -->
+        <div class="card border-0 shadow-lg" style="background-color: var(--gsu-surface); border-radius: 16px;">
+          <div class="card-body p-5">
+            
+            <div class="text-center mb-4">
+              <h1 class="h3 fw-bold text-white mb-2">GSU Campus Food</h1>
+              <p class="text-secondary small">Sign in to your account to continue</p>
+            </div>
+
+            <!-- Error Alert -->
+            <div id="loginAlert" class="alert alert-danger d-none shadow-sm" role="alert" style="border-radius: 8px; font-size: 0.9rem;"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" novalidate>
+              <div class="mb-4">
+                <label for="email" class="form-label text-secondary small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Email Address</label>
+                <input type="email" class="form-control form-control-lg bg-dark border-secondary text-white shadow-none" id="email" required autocomplete="email" style="border-radius: 8px;">
+              </div>
+              
+              <div class="mb-4">
+                <label for="password" class="form-label text-secondary small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Password</label>
+                <input type="password" class="form-control form-control-lg bg-dark border-secondary text-white shadow-none" id="password" required autocomplete="current-password" style="border-radius: 8px;">
+              </div>
+              
+              <button type="submit" class="btn btn-gsu-primary btn-lg w-100 fw-medium mt-2" id="loginBtn" style="border-radius: 8px; transition: all 0.2s ease;">
+                Sign In
+              </button>
+            </form>
+
+            <div class="text-center mt-4 pt-2">
+              <p class="text-secondary small mb-0">
+                Don't have an account? <a href="/shared/register.html" class="text-decoration-none fw-medium" style="color: #10B981;">Register here</a>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (now allowed by the CSP fix) -->
+  <script src="/shared/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Added Theme Script -->
+  <script src="/shared/js/theme.js"></script>
+  <script src="/shared/js/apiClient.js"></script>
+  <script src="/shared/js/auth.js"></script>
+</body>
+</html>

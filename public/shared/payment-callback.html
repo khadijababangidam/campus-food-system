@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Result — GSU Campus Food</title>
+  <link href="/shared/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/shared/css/base.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="col-12 col-sm-8 col-md-5 col-lg-4 text-center">
+      <div id="loadingState">
+        <div class="spinner-border text-success mb-3" role="status"></div>
+        <p>Confirming your payment…</p>
+      </div>
+
+      <div id="successState" class="d-none">
+        <h1 class="h4 text-success mb-2">Payment Successful</h1>
+        <p class="text-muted">Your order has been confirmed. The vendor has been notified.</p>
+        <a href="/student/dashboard.html" class="btn btn-gsu-primary w-100 mt-2">Back to Dashboard</a>
+      </div>
+
+      <div id="failedState" class="d-none">
+        <h1 class="h4 text-danger mb-2">Payment Failed</h1>
+        <p class="text-muted">Your payment wasn't successful. You can retry or cancel the order from your dashboard.</p>
+        <a href="/student/dashboard.html" class="btn btn-gsu-primary w-100 mt-2">Back to Dashboard</a>
+      </div>
+
+      <div id="errorState" class="d-none">
+        <h1 class="h4 text-danger mb-2">Something Went Wrong</h1>
+        <p id="errorMessage" class="text-muted"></p>
+        <a href="/student/dashboard.html" class="btn btn-outline-secondary w-100 mt-2">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared/js/apiClient.js"></script>
+  <script>
+    (async function () {
+      const params = new URLSearchParams(window.location.search);
+      const reference = params.get('reference') || params.get('trxref');
+
+      const show = (id) => {
+        ['loadingState', 'successState', 'failedState', 'errorState'].forEach(s =>
+          document.getElementById(s).classList.toggle('d-none', s !== id)
+        );
+      };
+
+      if (!reference) {
+        document.getElementById('errorMessage').textContent = 'No payment reference found in the URL.';
+        show('errorState');
+        return;
+      }
+
+      try {
+        const { data } = await window.GSUApi.apiRequest(`/payments/verify/${encodeURIComponent(reference)}`);
+        show(data.status === 'success' ? 'successState' : 'failedState');
+      } catch (err) {
+        document.getElementById('errorMessage').textContent = err.message || 'Could not confirm payment status.';
+        show('errorState');
+      }
+    })();
+  </script>
+</body>
+</html>

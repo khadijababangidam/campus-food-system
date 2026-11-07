@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Student Portal — GSU Campus Food</title>
+  <link href="/shared/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link href="/shared/css/base.css" rel="stylesheet">
+  <style>
+   /* Premium Mobile-First Tweaks */
+    body { background-color: var(--gsu-bg); padding-bottom: 80px; /* Space for bottom nav */ }
+    
+    /* Use dynamic variables instead of hardcoded RGBA */
+    .glass-header { background: var(--gsu-nav-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--gsu-border); }
+    .food-gradient { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.02) 100%); border-radius: 12px; height: 100px; display: flex; align-items: center; justify-content: center; }
+    
+    /* Desktop Top Nav - Hidden on mobile */
+    @media (max-width: 767.98px) { .desktop-nav-actions { display: none !important; } }
+    
+    /* Mobile Bottom Nav - Hidden on desktop */
+    .mobile-bottom-nav { background: var(--gsu-nav-bg); backdrop-filter: blur(16px); border-top: 1px solid var(--gsu-border); z-index: 1030; }
+    .nav-icon-btn { flex: 1; text-align: center; color: var(--gsu-text-muted); background: transparent; border: none; padding: 10px 0; font-size: 0.75rem; transition: color 0.2s; }
+    .nav-icon-btn i { font-size: 1.5rem; display: block; margin-bottom: 2px; }
+    .nav-icon-btn:hover, .nav-icon-btn:active { color: var(--gsu-primary); }
+    
+    /* Offcanvas Premium Styling */
+    .offcanvas { background-color: var(--gsu-surface); border-left: 1px solid var(--gsu-border); }
+    .thumb-btn { height: 48px; border-radius: 12px; font-weight: 600; letter-spacing: 0.5px; }
+    
+    /* Custom input styling */
+    .filter-select { background-color: var(--gsu-surface); border: 1px solid var(--gsu-border); border-radius: 12px; height: 48px; color: var(--gsu-text); }
+    .filter-select:focus { border-color: var(--gsu-primary); box-shadow: 0 0 0 4px rgba(16,185,129,0.1); }
+  </style>
+</head>
+<body>
+  <!-- Sticky Header -->
+  <nav class="navbar sticky-top glass-header py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="navbar-brand mb-0 h1 fw-bold text-white tracking-wide d-flex align-items-center gap-2">
+        <i class="bi bi-grid-fill text-success"></i> GSU Food
+      </span>
+      
+      <div class="d-flex align-items-center gap-2">
+        <!-- Theme Toggle Button (Visible on all screens) -->
+        <button id="themeToggleBtn" class="btn btn-sm btn-outline-light border-0 me-md-2" title="Toggle Theme">
+          <i id="themeIcon" class="bi bi-moon-stars-fill text-warning fs-5"></i>
+        </button>
+
+        <!-- Desktop Navigation Actions -->
+        <div class="d-flex align-items-center gap-3 desktop-nav-actions">
+          <button class="btn btn-outline-light border-0 position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartPanel">
+            <i class="bi bi-cart3 fs-5"></i>
+            <span id="cartCountDesktop" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark d-none">0</span>
+          </button>
+          <button class="btn btn-outline-light border-0" data-bs-toggle="offcanvas" data-bs-target="#ordersPanel"><i class="bi bi-receipt fs-5"></i></button>
+          <button id="logoutBtnDesktop" class="btn btn-sm btn-danger fw-medium px-4 rounded-pill">Log out</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-4">
+    <div id="alertBox" class="alert d-none shadow-sm mb-4 border-0" role="alert" style="border-radius: 12px;"></div>
+
+    <div class="mb-4">
+      <h1 class="h3 fw-bold text-white mb-3">What are you craving?</h1>
+      <div class="row g-2">
+        <div class="col-6">
+          <select id="vendorFilter" class="form-select filter-select shadow-none">
+            <option value="">All Vendors</option>
+          </select>
+        </div>
+        <div class="col-6">
+          <select id="categoryFilter" class="form-select filter-select shadow-none">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="menuGrid" class="row g-3"></div>
+    <div id="emptyState" class="text-center py-5 d-none">
+      <i class="bi bi-search display-1 text-muted opacity-50 mb-3 d-block"></i>
+      <p class="text-muted fs-5 mb-0">No menu items match your filters.</p>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation (Hidden on Desktop) -->
+  <div class="fixed-bottom mobile-bottom-nav d-md-none d-flex justify-content-around pb-2 pt-1 px-2">
+    <button class="nav-icon-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+      <i class="bi bi-house-door-fill text-success"></i>
+      <span>Home</span>
+    </button>
+    <button class="nav-icon-btn position-relative" data-bs-toggle="offcanvas" data-bs-target="#ordersPanel">
+      <i class="bi bi-receipt"></i>
+      <span>Orders</span>
+    </button>
+    <button class="nav-icon-btn position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartPanel">
+      <i class="bi bi-cart3"></i>
+      <span>Cart</span>
+      <span id="cartCountMobile" class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-warning text-dark d-none" style="margin-top: 5px;">0</span>
+    </button>
+    <button class="nav-icon-btn" id="logoutBtnMobile">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+
+  <!-- Cart Offcanvas -->
+  <div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="cartPanel">
+    <div class="offcanvas-header px-4 py-3 border-bottom border-secondary border-opacity-25">
+      <h5 class="offcanvas-title fw-bold text-white d-flex align-items-center gap-2">
+        <i class="bi bi-bag-check text-success"></i> Your Cart
+      </h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column p-0">
+      <div class="px-4 py-2 bg-dark bg-opacity-50">
+        <p id="cartVendorName" class="text-warning small fw-semibold mb-0 text-uppercase tracking-wide"></p>
+      </div>
+      <div id="cartItems" class="flex-grow-1 overflow-auto p-3"></div>
+      <div id="cartEmpty" class="text-center py-5 px-4 text-muted">
+        <i class="bi bi-cart-x display-1 opacity-25 mb-3 d-block"></i>
+        <p class="mb-0 fs-5">Your cart is empty.</p>
+      </div>
+      
+      <div class="p-4 bg-dark border-top border-secondary border-opacity-25 mt-auto">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+          <span class="text-secondary fw-medium">Total Amount</span>
+          <span class="h3 fw-bold text-success mb-0" id="cartTotal">₦0.00</span>
+        </div>
+        <div id="checkoutError" class="alert alert-danger d-none small shadow-sm mb-3" style="border-radius: 8px;"></div>
+        <button id="checkoutBtn" class="btn btn-gsu-primary thumb-btn w-100 shadow-sm d-flex justify-content-center align-items-center gap-2">
+          <span>Checkout</span> <i class="bi bi-arrow-right-short fs-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Orders Offcanvas -->
+  <div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="ordersPanel" style="width: 100%; max-width: 420px;">
+    <div class="offcanvas-header px-4 py-3 border-bottom border-secondary border-opacity-25">
+      <h5 class="offcanvas-title fw-bold text-white d-flex align-items-center gap-2">
+        <i class="bi bi-clock-history text-success"></i> Order History
+      </h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-3 bg-transparent">
+      <div id="ordersList" class="d-flex flex-column gap-3"></div>
+      <div id="ordersEmpty" class="text-center py-5 d-none">
+        <i class="bi bi-receipt display-1 opacity-25 mb-3 d-block text-muted"></i>
+        <p class="text-muted mb-0 fs-5">No orders found.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave a Review Modal -->
+  <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg" style="background-color: var(--gsu-surface); border-radius: 16px;">
+        <div class="modal-header border-0 px-4 pt-4 pb-2">
+          <h5 class="modal-title fw-bold text-white fs-4">Rate Experience</h5>
+          <button type="button" class="btn-close btn-close-white bg-dark p-2 rounded-circle" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body px-4 pb-4">
+          <form id="reviewForm" novalidate>
+            <input type="hidden" id="reviewOrderId" value="">
+            <div class="mb-4 text-center">
+              <select class="form-select form-select-lg bg-dark border-secondary text-warning fw-bold shadow-none text-center" id="reviewRating" required style="border-radius: 12px; height: 56px;">
+                <option value="5">★★★★★ Excellent</option>
+                <option value="4">★★★★☆ Good</option>
+                <option value="3">★★★☆☆ Okay</option>
+                <option value="2">★★☆☆☆ Poor</option>
+                <option value="1">★☆☆☆☆ Very Poor</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <textarea class="form-control bg-dark border-secondary text-white shadow-none p-3" id="reviewComment" rows="3" maxlength="2000" placeholder="What did you love? What could be better?" style="border-radius: 12px; resize: none;"></textarea>
+            </div>
+            <div id="reviewFormError" class="alert alert-danger d-none small shadow-sm" style="border-radius: 8px;"></div>
+            <button type="button" class="btn btn-gsu-primary thumb-btn w-100 mt-2" id="submitReviewBtn">Submit Feedback</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Added Theme Script -->
+  <script src="/shared/js/theme.js"></script>
+  <script src="/shared/js/apiClient.js"></script>
+  <script src="/shared/js/authGuard.js"></script>
+  <script src="/student/student.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Environment variables — contains real secrets (DB password, JWT_SECRET,
+# Paystack keys, admin bootstrap password). NEVER commit this file.
+.env
+
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Test artifacts
+coverage/

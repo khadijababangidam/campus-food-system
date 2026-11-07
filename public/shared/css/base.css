@@ -1,0 +1,100 @@
+/* Base Theme - Light Mode (Default Variables) */
+:root {
+  --gsu-bg: #F8FAFC;         /* Light Slate - Main background */
+  --gsu-surface: #FFFFFF;    /* Pure White - Cards, modals */
+  --gsu-border: #E2E8F0;     /* Muted Silver - Subtle dividers */
+  
+  --gsu-primary: #10B981;    /* Emerald Green - Main CTAs (Consistent in both themes) */
+  --gsu-primary-hover: #059669;
+  
+  --gsu-accent: #F59E0B;     /* Amber Gold */
+  --gsu-danger: #EF4444;     /* Crimson Coral */
+  
+  --gsu-text: #0F172A;       /* Deep Obsidian - Primary text */
+  --gsu-text-muted: #64748B; /* Cool Grey - Meta text */
+  
+  --gsu-nav-bg: rgba(255, 255, 255, 0.85); /* Frosted white glass */
+}
+
+/* Dark Mode Variable Overrides */
+[data-bs-theme="dark"] {
+  --gsu-bg: #0B0F19;         
+  --gsu-surface: #151E2E;    
+  --gsu-border: #243046;     
+  
+  --gsu-text: #F8FAFC;       
+  --gsu-text-muted: #94A3B8; 
+  
+  --gsu-nav-bg: rgba(21, 30, 46, 0.85); /* Frosted dark glass */
+}
+
+/* Global Transitions for Smooth Toggling */
+body {
+  background-color: var(--gsu-bg);
+  color: var(--gsu-text);
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Component Styling mapping to variables */
+.navbar-gsu {
+  background-color: var(--gsu-nav-bg) !important;
+  border-bottom: 1px solid var(--gsu-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background-color 0.3s ease;
+}
+
+.btn-gsu-primary {
+  background-color: var(--gsu-primary);
+  border-color: var(--gsu-primary);
+  color: #ffffff;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+.btn-gsu-primary:hover, .btn-gsu-primary:focus {
+  background-color: var(--gsu-primary-hover);
+  border-color: var(--gsu-primary-hover);
+  color: #ffffff;
+  box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+  transform: translateY(-1px);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--gsu-primary) !important;
+  box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25) !important;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--gsu-bg); }
+::-webkit-scrollbar-thumb { background: var(--gsu-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gsu-text-muted); }
+
+
+/* =======================================================================
+   THE MAGIC LAYER: Light Mode overrides for hardcoded Bootstrap classes.
+   This prevents us from having to rewrite the HTML dashboards!
+   ======================================================================= */
+[data-bs-theme="light"] .bg-dark { background-color: var(--gsu-surface) !important; }
+[data-bs-theme="light"] .text-white { color: var(--gsu-text) !important; }
+[data-bs-theme="light"] .border-secondary { border-color: var(--gsu-border) !important; }
+[data-bs-theme="light"] .text-secondary, [data-bs-theme="light"] .text-muted { color: var(--gsu-text-muted) !important; }
+
+/* Invert buttons and inputs for light mode */
+[data-bs-theme="light"] .btn-outline-light { color: var(--gsu-text); border-color: var(--gsu-border); }
+[data-bs-theme="light"] .btn-outline-light:hover { background-color: var(--gsu-border); }
+[data-bs-theme="light"] .form-control, [data-bs-theme="light"] .form-select { background-color: var(--gsu-bg) !important; color: var(--gsu-text) !important; }
+
+/* Make the white close (X) buttons dark in light mode */
+[data-bs-theme="light"] .btn-close-white { filter: invert(1) grayscale(100%) brightness(0%); }
