@@ -4,7 +4,7 @@
   "description": "Online Campus Food Ordering & Delivery System with Payment Integration - Gombe State University",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node database/migrate.js && node database/seed.js && node database/seedAdmin.js && node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "jest --runInBand --forceExit",
     "migrate": "node database/migrate.js",
