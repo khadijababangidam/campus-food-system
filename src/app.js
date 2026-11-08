@@ -12,6 +12,7 @@ const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Security headers (NFR: Security)
 // Bootstrap and its icon font are vendored locally under public/shared/vendor
