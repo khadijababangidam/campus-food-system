@@ -16,8 +16,12 @@ async function start() {
 
     server.on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use. Please wait a moment for the previous instance to release it.`);
-        process.exit(1);
+        console.warn(`Port ${PORT} is busy. Retrying in 3 seconds...`);
+        setTimeout(() => {
+          server.close(() => {
+            start();
+          });
+        }, 3000);
       } else {
         console.error('Server encountered an unexpected error:', err);
         process.exit(1);
@@ -29,7 +33,8 @@ async function start() {
       'Failed to start server — database connection failed:',
       err.message
     );
-    process.exit(1);
+    console.log('Retrying connection in 5 seconds...');
+    setTimeout(start, 5000);
   }
 }
 
