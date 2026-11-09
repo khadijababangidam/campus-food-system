@@ -60,6 +60,11 @@ app.use('/api', apiLimiter);
 // Static frontend
 app.use(express.static('public'));
 
+// Redirect root URL to the shared login page instead of showing "Cannot GET /"
+app.get('/', (req, res) => {
+  res.redirect('/shared/login.html');
+});
+
 // API routes
 app.use('/api/v1', routes);
 
