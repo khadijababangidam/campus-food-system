@@ -50,7 +50,10 @@ async function initializePayment(userId, orderId) {
 
   const reference = generateReference(orderId);
   const amountKobo = Math.round(Number(order.total_amount) * 100);
-  const callbackUrl = `${process.env.APP_BASE_URL}/shared/payment-callback.html`;
+  
+  // Use environment variable with a safe production fallback to prevent undefined redirects
+  const baseUrl = process.env.APP_BASE_URL || 'https://campus-food-system-production-5b3d.up.railway.app';
+  const callbackUrl = `${baseUrl}/shared/payment-callback.html`;
 
   const gatewayResult = await paystackGateway.initializeTransaction({
     email: order.customer_email,
