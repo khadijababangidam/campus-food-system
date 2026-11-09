@@ -43,9 +43,13 @@ async function create({ orderId, gateway, reference, amount }) {
 }
 
 async function markSuccess(id, paidAt) {
+  // Convert ISO date string or default to current date, then format for MySQL DATETIME ('YYYY-MM-DD HH:mm:ss')
+  const dateObj = paidAt ? new Date(paidAt) : new Date();
+  const formattedPaidAt = dateObj.toISOString().slice(0, 19).replace('T', ' ');
+
   await pool.query(
     "UPDATE payments SET status = 'success', paid_at = ? WHERE id = ?",
-    [paidAt || new Date(), id]
+    [formattedPaidAt, id]
   );
   return findById(id);
 }
